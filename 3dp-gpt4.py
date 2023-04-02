@@ -26,8 +26,13 @@ voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[0].id)
 
 #OPENAPI KEY
-with open('hidden.txt') as file:
-    openai.api_key = file.read()
+with open('secrets.txt', 'r') as file:
+    secrets = []
+    for line in file:
+        secrets.append(line.strip())
+    openai.api_key = secrets[0]
+    api_url = secrets[1]
+    forecast_url = secrets[2]
 
 model_id = 'gpt-4'
 
@@ -47,9 +52,6 @@ def chatgpt_conversation(conversation_log):
     return conversation_log
 
 def get_weather_info():
-    api_url = "URL HERE"
-    forecast_url = "URL HERE"
-
     planet_response = requests.get(api_url).text
     forecast_response = requests.get(forecast_url).text
 
@@ -79,8 +81,7 @@ def get_song_info(song):
 def api_calls(message):
     if(message.startswith("[MUSIC]")):
         song = message[7:]
-        results = get_song_info(song)
-        return
+        return get_song_info(song)
     elif message == "WEATHER":
         chatresponse = get_weather_info()
         return chatresponse
