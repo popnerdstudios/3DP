@@ -1,5 +1,6 @@
 import os
 import openai
+import time
 import pyttsx3
 import speech_recognition as sr
 import pyttsx3
@@ -104,10 +105,16 @@ while True:
 
             #listens for the user's input
             audio2 = r.listen(source2)
+            with open("microphone-results.wav", "wb") as f:
+                f.write(audio2.get_wav_data())
 
             # Using google to recognize audio
-            MyText = r.recognize_google(audio2)
-            MyText = MyText.lower()
+            # MyText = r.recognize_google(audio2)
+
+            #Whisper API
+            with open("microphone-results.wav", "rb") as f:
+                MyText = openai.Audio.transcribe("whisper-1", f)
+                MyText = MyText.text
 
             #prompt = input('User: ')
             prompt = 'User: ' + MyText
@@ -123,7 +130,11 @@ while True:
                 response = api_calls(command)
 
             if(response != "None"):
-                print('{0}: {1}\n'.format(role, response))
+                if(role == 'assistant'):
+                    airole = '3-DP'
+                else:
+                    airole = role
+                print('{0}: {1}\n'.format(airole, response))
                 engine.say(response)
                 engine.runAndWait()
 
